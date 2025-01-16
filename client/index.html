@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Application</title>
+    <meta name="viewport" content="initial-scale=1, width=device-width" />
+   
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+    <script src="https://smtpjs.com/v3/smtp.js"></script>
+    <script>
+        function sendEmail () {
+          Email.send({
+          Host: "smtp.elasticemail.com",
+          Username: "your-email@example.com",
+          Password: "your-email-password",
+          To: "recipient@example.com",
+          From: emailInput,
+          Subject: "Hello from the website",
+          Body: "This is a test email."
+        }).then((message) => alert(message));
+  }
+
+  
+    </script>
+
+  </body>
+</html>

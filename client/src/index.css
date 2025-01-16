@@ -1,0 +1,27 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  margin: 0; 
+  overflow: hidden;
+  display: flex; /* Centrado del contenido */
+  justify-content: center; 
+  align-items: center; 
+  min-height: 100vh;
+  position: relative;
+  background: none; 
+}
+
+body::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1; /* Detrás del contenido */
+  background-image: url('../images/mountainsfondo.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 1; 
+}
