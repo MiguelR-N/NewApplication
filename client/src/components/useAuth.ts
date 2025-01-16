@@ -2,61 +2,55 @@ import { useState } from 'react';
 
 export const useAuth = () => {
   const [loading, setLoading] = useState(false);
-  const [errors, setErrors] = useState<any>({});
 
-  // Función para manejar el registro del usuario
-  const handleSignUp = async (fields: any) => {
+  const handleSignUp = async (fields: { name: string; email: string; password: string }) => {
     setLoading(true);
     try {
-      // Realizar la solicitud a la API de registro
-      const response = await fetch('/api/register', {
+      const response = await fetch('http://localhost:5000/api/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(fields), // Enviar los campos del formulario
+        body: JSON.stringify(fields),
       });
 
-      // Verificar si la solicitud fue exitosa
       if (!response.ok) {
-        throw new Error('Registration failed. Please try again.');
+        throw new Error('Failed to register');
       }
 
       const data = await response.json();
-      return data; // Aquí puedes manejar la respuesta si es necesario
+      console.log(data.message); // O manejar la respuesta como necesites
     } catch (error) {
-      setErrors({ message: error.message });
+      console.error(error);
+      alert('Error during sign up');
     } finally {
       setLoading(false);
     }
   };
 
-  // Función para manejar la verificación del código
   const handleVerification = async (fields: any) => {
-    setLoading(true);
-    try {
-      // Realizar la solicitud a la API de verificación
-      const response = await fetch('/api/verify', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(fields), // Enviar el código de verificación
-      });
-
-      // Verificar si la solicitud fue exitosa
-      if (!response.ok) {
-        throw new Error('Verification failed. Please try again.');
-      }
-
-      const data = await response.json();
-      return data; // Aquí puedes manejar la respuesta si es necesario
-    } catch (error) {
-      setErrors({ message: error.message });
-    } finally {
-      setLoading(false);
+    const response = await fetch('http://localhost:5000/api/verify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: fields.email,
+        code: fields.verificationCode,
+      }),
+    });
+  
+    if (!response.ok) {
+      throw new Error('Failed to verify code.');
+    }
+  
+    const data = await response.json();
+    if (data.message === 'User verified successfully.') {
+      // Verificación exitosa
+    } else {
+      // Error en la verificación
+      throw new Error('Invalid verification code or email.');
     }
   };
+  
 
-  return { handleSignUp, handleVerification, loading, errors };
+  return { handleSignUp, handleVerification, loading };
 };

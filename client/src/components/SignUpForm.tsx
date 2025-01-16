@@ -74,10 +74,16 @@ const SignUpForm = () => {
 
   const handleSubmitVerification = async () => {
     if (!fields.verificationCode) return alert('Enter verification code.');
-    await handleVerification(fields);
-    alert('Verification successful! Registration complete.');
-    navigate('/Content');
+  
+    try {
+      await handleVerification(fields);  // Llamada al backend
+      alert('Verification successful! Registration complete.');
+      navigate('/Content');  // Redirigir después de la verificación exitosa
+    } catch (error) {
+      alert('Invalid verification code or email.');  // Si hay un error en la verificación
+    }
   };
+  
 
 
   return (
