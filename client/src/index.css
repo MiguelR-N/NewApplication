@@ -6,12 +6,13 @@ body {
   font-family: Arial, Helvetica, sans-serif;
   margin: 0; 
   overflow: hidden;
-  display: flex; /* Centrado del contenido */
-  justify-content: center; 
+  display: flex; /* Para centrar verticalmente */
+  justify-content: flex-start; /* Mantiene el contenido alineado a la izquierda */
   align-items: center; 
   min-height: 100vh;
   position: relative;
-  background: none; 
+  background: none;
+  padding-left: 8em; /* Ajusta este valor según lo que necesites */
 }
 
 body::before {
@@ -19,7 +20,7 @@ body::before {
   position: absolute;
   inset: 0;
   z-index: -1; /* Detrás del contenido */
-  background-image: url('../images/mountainsfondo.jpg');
+  background-image: url('../images/fondoOffice.jpg');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;

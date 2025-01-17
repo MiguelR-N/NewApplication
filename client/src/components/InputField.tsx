@@ -2,7 +2,6 @@ import React from 'react';
 import FormControl from '@mui/material/FormControl';
 import TextField from '@mui/material/TextField';
 import InputAdornment from '@mui/material/InputAdornment';
-import { TextFieldProps } from '@mui/material/TextField';
 
 type InputFieldProps = {
   label: string;
@@ -25,9 +24,9 @@ const InputField = ({
   error,
   helperText,
   startIcon,
-  type = 'text',  
+  type = 'text',
 }: InputFieldProps) => (
-  <FormControl>
+  <FormControl sx={{ marginBottom: 0.5 }}>
     <TextField
       fullWidth
       label={label}
@@ -36,13 +35,23 @@ const InputField = ({
       onChange={onChange}
       onFocus={onFocus}
       error={error}
-      helperText={helperText}
       InputProps={{
         startAdornment: <InputAdornment position="start">{startIcon}</InputAdornment>,
       }}
-      type={type} 
+      type={type}
       autoComplete="off"
     />
+    {/* Contenedor con espacio reservado para el mensaje de error */}
+    <div
+      style={{
+        minHeight: '12px', // Altura mínima reducida
+        fontSize: '12px',
+        color: error ? 'red' : 'transparent',
+        marginTop: '2px', // Margen superior mínimo
+      }}
+    >
+      {helperText || ' '}
+    </div>
   </FormControl>
 );
 

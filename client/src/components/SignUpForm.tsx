@@ -10,10 +10,10 @@ import AccountCircle from '@mui/icons-material/AccountCircle';
 import EmailIcon from '@mui/icons-material/Email';
 import LockIcon from '@mui/icons-material/Lock';
 import VerifiedUserIcon from '@mui/icons-material/VerifiedUser';
-import GoogleLogo from '@mui/icons-material/Google'; // Asegúrate de importar el logo de Google
+import GoogleLogo from '@mui/icons-material/Google';
 import Divider from '@mui/material/Divider';
 import Typography from '@mui/material/Typography';
-import Link from '@mui/material/Link'; // Para el enlace de "Sign in"
+import Link from '@mui/material/Link';
 
 // Type Errors para definir la estructura de los datos
 type Errors = {
@@ -23,9 +23,8 @@ type Errors = {
   verificationCode?: string;
 };
 
-// Manejamos el estado 'Field' que es la que usamos para actualizar el estado de los campos 
 const SignUpForm = () => {
-  const navigate = useNavigate(); // El hook de react-router-dom para redirigir a diferentes rutas
+  const navigate = useNavigate();
   const [fields, setFields] = useState({
     name: '',
     email: '',
@@ -33,30 +32,23 @@ const SignUpForm = () => {
     verificationCode: '',
   });
 
-  // Algunos hooks de estado
   const [isCodeSent, setIsCodeSent] = useState(false);
   const [errors, setErrors] = useState<Errors>({});
 
-  // Hooks de la lógica de autenticación personalizada, que se encuentran en 'useAuth.ts'
   const { handleSignUp, handleVerification, loading } = useAuth();
 
-  // Evento para actualizar el estado de los campos conforme se escribe en el input
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) =>
     setFields({ ...fields, [e.target.name]: e.target.value });
 
-  // Evento para manejar el foco en un campo
   const handleFocus = (field: keyof Errors) =>
     setErrors((prev) => ({ ...prev, [field]: '' }));
 
-  // Evento para enviar el formulario de registro
   const handleSubmitSignUp = async () => {
     setErrors({});
-
     try {
       await validationSchema.validate(fields, { abortEarly: false });
       await handleSignUp(fields);
-      setIsCodeSent(true);
-      alert('Verification code sent to your email.');
+      setIsCodeSent(true); // Avanzar al siguiente paso
     } catch (error) {
       if (error instanceof Yup.ValidationError) {
         const validationErrors: Errors = {};
@@ -65,26 +57,30 @@ const SignUpForm = () => {
         });
         setErrors(validationErrors);
       } else {
-        alert(error.message);
+        console.error('Error en el registro:', error.message);
       }
     }
   };
 
-  // Evento para enviar el formulario de verificación
-
   const handleSubmitVerification = async () => {
-    if (!fields.verificationCode) return alert('Enter verification code.');
-  
+    if (!fields.verificationCode) {
+      setErrors((prev) => ({
+        ...prev,
+        verificationCode: 'Enter verification code.',
+      }));
+      return;
+    }
+
     try {
-      await handleVerification(fields);  // Llamada al backend
-      alert('Verification successful! Registration complete.');
-      navigate('/Content');  // Redirigir después de la verificación exitosa
+      await handleVerification(fields);
+      navigate('/Content'); // Navegar después de la verificación exitosa
     } catch (error) {
-      alert('Invalid verification code or email.');  // Si hay un error en la verificación
+      setErrors((prev) => ({
+        ...prev,
+        verificationCode: 'Invalid verification code or email.',
+      }));
     }
   };
-  
-
 
   return (
     <Box component="form" sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }} autoComplete="off">
@@ -124,7 +120,7 @@ const SignUpForm = () => {
           <Button onClick={handleSubmitSignUp} fullWidth variant="contained" disabled={loading} sx={{ background: 'black' }}>
             {loading ? 'Signing Up...' : 'Sign Up'}
           </Button>
-          
+
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
             <Divider>
               <Typography sx={{ color: 'text.secondary' }}>or</Typography>
@@ -132,7 +128,7 @@ const SignUpForm = () => {
             <Button
               fullWidth
               variant="outlined"
-              onClick={() => alert('Sign up with Google')}
+              onClick={() => console.log('Sign up with Google')}
               startIcon={<GoogleLogo />}
               sx={{
                 backgroundColor: 'black',
