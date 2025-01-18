@@ -7,44 +7,52 @@ import {
   ListItem,
   ListItemText,
   IconButton,
-  Snackbar,
-  Alert,
   Avatar,
   Drawer,
   Divider,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { CloudUpload as CloudUploadIcon, Info as InfoIcon } from "@mui/icons-material";
+import Swal from "sweetalert2";
 
 const Content = () => {
   const [files, setFiles] = useState<File[]>([]);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [totalSize, setTotalSize] = useState(0); // Tamaño total de los archivos en bytes
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
 
   const FILES_PER_PAGE = 4;
+  const MAX_SIZE_MB = 300;
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
       const newFiles = Array.from(event.target.files);
       const currentFiles = [...files, ...newFiles];
-      const totalSize = currentFiles.reduce((sum, file) => sum + file.size, 0);
+      const newTotalSize = currentFiles.reduce((sum, file) => sum + file.size, 0);
 
-      if (totalSize > 300 * 1024 * 1024) {
-        setErrorMessage("El tamaño total de los archivos no puede exceder los 300MB.");
-        setOpenSnackbar(true);
+      if (newTotalSize > MAX_SIZE_MB * 1024 * 1024) {
+        Swal.fire({
+          icon: "error",
+          title: "Límite Excedido",
+          text: `El tamaño total de los archivos no puede exceder los ${MAX_SIZE_MB} MB.`,
+          confirmButtonColor: "#ff1a1a",
+        });
         return;
       }
 
-      setErrorMessage(null);
-      setFiles((prevFiles) => [...prevFiles, ...newFiles]);
+      setFiles(currentFiles);
+      setTotalSize(newTotalSize);
     }
   };
 
   const handleRemoveFile = (fileToRemove: File) => {
-    setFiles(files.filter((file) => file !== fileToRemove));
+    const updatedFiles = files.filter((file) => file !== fileToRemove);
+    const updatedTotalSize = updatedFiles.reduce((sum, file) => sum + file.size, 0);
+
+    setFiles(updatedFiles);
+    setTotalSize(updatedTotalSize);
+
     if (selectedFile === fileToRemove) {
       setDrawerOpen(false);
       setSelectedFile(null);
@@ -59,10 +67,6 @@ const Content = () => {
   const handleCloseDrawer = () => {
     setDrawerOpen(false);
     setSelectedFile(null);
-  };
-
-  const handleCloseSnackbar = () => {
-    setOpenSnackbar(false);
   };
 
   const indexOfLastFile = currentPage * FILES_PER_PAGE;
@@ -89,7 +93,7 @@ const Content = () => {
         height: "100vh",
         background: "linear-gradient(45deg, #333, #000)",
         color: "white",
-        paddingY: 2, // Espaciado superior e inferior
+        paddingY: 2,
       }}
     >
       {/* Panel de carga de archivos */}
@@ -102,6 +106,12 @@ const Content = () => {
       >
         <Typography variant="h5" gutterBottom>
           Cargar Archivos
+        </Typography>
+        <Typography variant="body2" gutterBottom sx={{ color: "rgba(255, 255, 255, 0.7)" }}>
+          Nota: El tamaño total de los archivos no debe exceder los {MAX_SIZE_MB} MB.
+        </Typography>
+        <Typography variant="body2" sx={{ marginBottom: 2 }}>
+          Tamaño actual: {(totalSize / 1024 / 1024).toFixed(2)} MB
         </Typography>
         <input
           type="file"
@@ -121,15 +131,6 @@ const Content = () => {
             Subir Archivos
           </Button>
         </label>
-        <Snackbar
-          open={openSnackbar}
-          autoHideDuration={6000}
-          onClose={handleCloseSnackbar}
-        >
-          <Alert onClose={handleCloseSnackbar} severity="error">
-            {errorMessage}
-          </Alert>
-        </Snackbar>
       </Box>
 
       {/* Panel de archivos subidos */}
@@ -147,7 +148,7 @@ const Content = () => {
                     display: "flex",
                     justifyContent: "space-between",
                     alignItems: "center",
-                    paddingY: 1, // Espaciado vertical
+                    paddingY: 1,
                   }}
                 >
                   <Box
