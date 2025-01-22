@@ -15,14 +15,15 @@ export const useAuth = () => {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to register');
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to register');
       }
 
       const data = await response.json();
-      console.log(data.message); // O manejar la respuesta como necesites
+      console.log(data.message); // Manejar la respuesta como necesites
     } catch (error) {
-      console.error(error);
-      alert('Error during sign up');
+      console.error('Error en el registro:', error.message);
+      alert(`Error en el registro: ${error.message}`);
     } finally {
       setLoading(false);
     }
@@ -37,20 +38,18 @@ export const useAuth = () => {
         code: fields.verificationCode,
       }),
     });
-  
+
     if (!response.ok) {
       throw new Error('Failed to verify code.');
     }
-  
+
     const data = await response.json();
     if (data.message === 'User verified successfully.') {
       // Verificación exitosa
     } else {
-      // Error en la verificación
       throw new Error('Invalid verification code or email.');
     }
   };
-  
 
   return { handleSignUp, handleVerification, loading };
 };

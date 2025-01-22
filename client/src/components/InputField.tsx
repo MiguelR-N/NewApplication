@@ -9,6 +9,8 @@ type InputFieldProps = {
   value: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onFocus: () => void;
+  onBlur?: (e: React.FocusEvent<HTMLInputElement>) => void; // Agregar onBlur como opcional
+  guideText?: string;
   error: boolean;
   helperText: string | undefined;
   startIcon: React.ReactNode;
@@ -21,12 +23,14 @@ const InputField = ({
   value,
   onChange,
   onFocus,
+  onBlur,
+  guideText,
   error,
   helperText,
   startIcon,
   type = 'text',
 }: InputFieldProps) => (
-  <FormControl sx={{ marginBottom: 0.5 }}>
+  <FormControl sx={{ marginBottom: 2, width: '100%' }}>
     <TextField
       fullWidth
       label={label}
@@ -34,6 +38,7 @@ const InputField = ({
       value={value}
       onChange={onChange}
       onFocus={onFocus}
+      onBlur={onBlur}
       error={error}
       InputProps={{
         startAdornment: <InputAdornment position="start">{startIcon}</InputAdornment>,
@@ -41,18 +46,22 @@ const InputField = ({
       type={type}
       autoComplete="off"
     />
-    {/* Contenedor con espacio reservado para el mensaje de error */}
+    {/* Contenedor con altura fija para mensajes */}
     <div
       style={{
-        minHeight: '12px', // Altura mínima reducida
-        fontSize: '12px',
-        color: error ? 'red' : 'transparent',
-        marginTop: '2px', // Margen superior mínimo
+        minHeight: '20px', // Altura fija para mensajes
+        fontSize: '10px',
+        marginTop: '4px',
+        color: error ? 'red' : '#6c757d', // Rojo para error, gris para guía
+        transition: 'opacity 0.2s ease-in-out', // Transición suave en visibilidad
+        opacity: error || guideText ? 1 : 0, // Controla visibilidad
       }}
     >
-      {helperText || ' '}
+      {error ? helperText : guideText}
     </div>
   </FormControl>
 );
+
+
 
 export default InputField;

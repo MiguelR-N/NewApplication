@@ -45,7 +45,7 @@ export default function App(): React.ReactElement {
           variant="h5" 
           sx={{ width: '100%', mb: 1 }} 
         >
-          Sign up
+          Create your new account!
         </Typography>
         <SignUpForm />
       </StyledCard>

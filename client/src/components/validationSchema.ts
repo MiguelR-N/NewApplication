@@ -3,7 +3,10 @@ import * as Yup from "yup";
 export const validationSchema = Yup.object({
   name: Yup.string().required("Name is required"),
   email: Yup.string()
-    .email("Invalid email address")
+    .matches(
+      /^[a-zA-Z0-9._%+-]+@gmail\.com$/,
+      "Email must be a valid Gmail address (e.g., user@gmail.com)"
+    )
     .required("Email is required"),
   password: Yup.string()
     .min(6, "Password must be at least 6 characters")

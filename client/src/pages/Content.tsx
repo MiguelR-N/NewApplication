@@ -90,7 +90,8 @@ const Content = () => {
     <Box
       sx={{
         display: "flex",
-        height: "100vh",
+        height: "90vh",
+        width: "140vh",
         background: "linear-gradient(45deg, #333, #000)",
         color: "white",
         paddingY: 2,
@@ -134,7 +135,7 @@ const Content = () => {
       </Box>
 
       {/* Panel de archivos subidos */}
-      <Box sx={{ width: "50%", padding: 3 }}>
+      <Box sx={{width: "50%",  padding: 3}} >
         <Typography variant="h5" gutterBottom>
           Archivos Subidos
         </Typography>

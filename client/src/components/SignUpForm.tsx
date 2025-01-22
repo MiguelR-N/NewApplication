@@ -2,20 +2,23 @@ import React, { useState } from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from './useAuth'; // Hook personalizado para manejar la lógica de autenticación
-import InputField from './InputField'; // Componente para los campos de entrada
-import { validationSchema } from './validationSchema'; // Esquema de validación con Yup
-import * as Yup from "yup";
-import AccountCircle from '@mui/icons-material/AccountCircle';
-import EmailIcon from '@mui/icons-material/Email';
-import LockIcon from '@mui/icons-material/Lock';
+import { useAuth } from './useAuth';
+import InputField from './InputField';
+import { validationSchema } from './validationSchema';
+import * as Yup from 'yup';
+import PersonIcon from '@mui/icons-material/Person';
+import MailOutlineIcon from '@mui/icons-material/MailOutline';
+import VpnKeyIcon from '@mui/icons-material/VpnKey';
 import VerifiedUserIcon from '@mui/icons-material/VerifiedUser';
 import GoogleLogo from '@mui/icons-material/Google';
 import Divider from '@mui/material/Divider';
 import Typography from '@mui/material/Typography';
 import Link from '@mui/material/Link';
+import Swal from 'sweetalert2';
+import withReactContent from 'sweetalert2-react-content';
 
-// Type Errors para definir la estructura de los datos
+const MySwal = withReactContent(Swal);
+
 type Errors = {
   name?: string;
   email?: string;
@@ -48,7 +51,16 @@ const SignUpForm = () => {
     try {
       await validationSchema.validate(fields, { abortEarly: false });
       await handleSignUp(fields);
-      setIsCodeSent(true); // Avanzar al siguiente paso
+
+      // Mostrar alerta de éxito
+      MySwal.fire({
+        icon: 'success',
+        title: 'Registration Successful!',
+        text: 'A verification code has been sent to your email. Please verify to complete the registration.',
+        confirmButtonColor: '#3085d6',
+      });
+
+      setIsCodeSent(true);
     } catch (error) {
       if (error instanceof Yup.ValidationError) {
         const validationErrors: Errors = {};
@@ -73,7 +85,16 @@ const SignUpForm = () => {
 
     try {
       await handleVerification(fields);
-      navigate('/Content'); // Navegar después de la verificación exitosa
+
+      // Mostrar alerta de éxito
+      MySwal.fire({
+        icon: 'success',
+        title: 'Verification Successful!',
+        text: 'Your account has been verified. Welcome aboard!',
+        confirmButtonColor: '#3085d6',
+      }).then(() => {
+        navigate('/Content'); // Navegar después de cerrar la alerta
+      });
     } catch (error) {
       setErrors((prev) => ({
         ...prev,
@@ -94,7 +115,8 @@ const SignUpForm = () => {
             onFocus={() => handleFocus('name')}
             error={!!errors.name}
             helperText={errors.name}
-            startIcon={<AccountCircle sx={{ color: 'black' }} />}
+            guideText="Enter your full name (e.g., John Doe)"
+            startIcon={<PersonIcon sx={{ color: 'black' }} />}
           />
           <InputField
             label="Email"
@@ -104,7 +126,8 @@ const SignUpForm = () => {
             onFocus={() => handleFocus('email')}
             error={!!errors.email}
             helperText={errors.email}
-            startIcon={<EmailIcon sx={{ color: 'black' }} />}
+            guideText="Use a valid email (e.g., example@gmail.com)"
+            startIcon={<MailOutlineIcon sx={{ color: 'black' }} />}
           />
           <InputField
             label="Password"
@@ -115,8 +138,10 @@ const SignUpForm = () => {
             onFocus={() => handleFocus('password')}
             error={!!errors.password}
             helperText={errors.password}
-            startIcon={<LockIcon sx={{ color: 'black' }} />}
+            guideText="At least 6 characters, including 1 uppercase, 1 number, and 1 special char."
+            startIcon={<VpnKeyIcon sx={{ color: 'black' }} />}
           />
+
           <Button onClick={handleSubmitSignUp} fullWidth variant="contained" disabled={loading} sx={{ background: 'black' }}>
             {loading ? 'Signing Up...' : 'Sign Up'}
           </Button>
@@ -143,7 +168,7 @@ const SignUpForm = () => {
             </Button>
             <Typography sx={{ textAlign: 'center' }}>
               Already have an account?{' '}
-              <Link href="/sign-in" variant="body2">
+              <Link href="/SignInForm" variant="body2">
                 Sign in
               </Link>
             </Typography>
@@ -160,6 +185,7 @@ const SignUpForm = () => {
             onFocus={() => handleFocus('verificationCode')}
             error={!!errors.verificationCode}
             helperText={errors.verificationCode}
+            guideText="Enter the 6-digit code sent to your email."
             startIcon={<VerifiedUserIcon sx={{ color: 'black' }} />}
           />
           <Button onClick={handleSubmitVerification} fullWidth variant="contained" disabled={loading} sx={{ background: 'black' }}>
